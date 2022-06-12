@@ -25,7 +25,7 @@ def extract_addresses(registry):
 def dump(addresses, random_indices):
     with open('addresses.txt', 'w') as f:
         for index, address in enumerate(addresses):
-            f.write(f'(\"{address}\", {random_indices[index]})')
+            f.write(f'(\"{address}\", {random_indices[index]}),')
 
 
 def main():
