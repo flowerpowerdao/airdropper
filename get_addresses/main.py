@@ -1,10 +1,9 @@
-from audioop import add
 import random
 from ic.canister import Canister
 from ic.client import Client
 from ic.identity import Identity
 from ic.agent import Agent
-from ic.candid import Types
+import sys
 
 iden = Identity()
 client = Client()
@@ -29,30 +28,29 @@ def dump(addresses, random_indices):
 
 
 def main():
-    # create pool of random numbers
-    random_indices = random.sample(range(4024), 4024)
-
     # read governance candid from file
     ext_did = open("production.did").read()
 
-    # create a governance canister instance
-    btcflower = Canister(
-        agent=agent, canister_id="pk6rk-6aaaa-aaaae-qaazq-cai", candid=ext_did)
+    # holds concatenation of all addresses
+    all_addresses = []
 
-    # create a governance canister instance
-    ethflower = Canister(
-        agent=agent, canister_id="dhiaa-ryaaa-aaaae-qabva-cai", candid=ext_did)
+    # get total collection size
+    total_size = int(sys.argv[1])
 
-    btcflower_registry = get_registry(btcflower)
-    ethflower_registry = get_registry(ethflower)
+    # loop over canister
+    for canister_id in sys.argv[2:]:
+        # create a canister instance
+        canister = Canister(
+            agent=agent, canister_id=canister_id, candid=ext_did)
+        # get registry
+        registry = get_registry(canister)
+        # extract the addresses
+        addresses = extract_addresses(registry)
+        all_addresses += addresses
 
-    btcflower_addresses = extract_addresses(btcflower_registry)
-    ethflower_addresses = extract_addresses(ethflower_registry)
+    # create pool of random numbers
+    random_indices = random.sample(
+        range(total_size), len(all_addresses))
 
-    addresses = btcflower_addresses + ethflower_addresses
-
-    dump(addresses, random_indices)
-
-
-if __name__ == "__main__":
-    main()
+    # dump addresses with random indices to file
+    dump(all_addresses, random_indices)
