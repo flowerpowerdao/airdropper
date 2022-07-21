@@ -17,6 +17,9 @@ def get_registry(canister: Canister):
 def extract_addresses(registry):
     addresses = []
     for entry in registry[0]:
+        # # filter for addressses that should be removed here
+        # if entry[1] == '04986920ad70b5e959851d8ac323a4cf3c0e164311cdd2b7da815c9b9553ba96':
+        #     continue
         addresses.append(entry[1])
     return addresses
 
