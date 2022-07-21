@@ -1,2 +1,4 @@
 addresses.txt
 .venv
+__pycache__
+for_sale.txt

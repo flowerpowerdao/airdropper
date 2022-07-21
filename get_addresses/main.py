@@ -21,10 +21,17 @@ def extract_addresses(registry):
     return addresses
 
 
-def dump(addresses, random_indices):
+def dump(addresses, random_indices, total_size):
     with open('addresses.txt', 'w') as f:
         for index, address in enumerate(addresses):
             f.write(f'(\"{address}\", {random_indices[index]}),')
+
+    difference = list(
+        set(random_indices).symmetric_difference(range(total_size)))
+
+    with open('for_sale.txt', 'w') as f:
+        for index in random.sample(difference, len(difference)):
+            f.write(f'{index},')
 
 
 def main():
@@ -53,4 +60,4 @@ def main():
         range(total_size), len(all_addresses))
 
     # dump addresses with random indices to file
-    dump(all_addresses, random_indices)
+    dump(all_addresses, random_indices, total_size)
