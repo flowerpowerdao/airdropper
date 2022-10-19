@@ -11,6 +11,7 @@ ic-py = "^1.0.0"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 autopep8 = "^1.6.0"
+black = {version = "^22.10.0", allow-prereleases = true}
 
 [tool.poetry.scripts]
 airdrop = 'get_addresses.main:main'
