@@ -3,7 +3,6 @@ from ic.canister import Canister
 from ic.client import Client
 from ic.identity import Identity
 from ic.agent import Agent
-import sys
 
 iden = Identity()
 client = Client()
@@ -27,40 +26,43 @@ def extract_addresses(registry):
     return addresses
 
 
-def dump(addresses, random_indices, total_size):
+def dump(addresses):
     with open("addresses.txt", "w") as f:
         for index, address in enumerate(addresses):
-            f.write(f'("{address}", {random_indices[index]}),')
+            f.write(f'"{address}",')
 
-    difference = list(set(random_indices).symmetric_difference(range(total_size)))
 
-    with open("for_sale.txt", "w") as f:
-        for index in random.sample(difference, len(difference)):
-            f.write(f"{index},")
+def get_holders(canister_id: str, ext_did: str):
+    canister = Canister(agent=agent, canister_id=canister_id, candid=ext_did)
+    # get registry
+    registry = get_registry(canister)
+    # extract the addresses
+    addresses = extract_addresses(registry)
+    return addresses
+
+
+def get_common_holders(btcflower, ethflower):
+    common_holders = list()
+    for address in btcflower:
+        if address in ethflower:
+            ethflower.remove(address)
+            common_holders.append(address)
+
+    return common_holders
 
 
 def main():
     # read governance candid from file
     ext_did = open("production.did").read()
 
-    # holds concatenation of all addresses
-    all_addresses = []
+    btcflower = get_holders("pk6rk-6aaaa-aaaae-qaazq-cai", ext_did)
+    ethflower = get_holders("dhiaa-ryaaa-aaaae-qabva-cai", ext_did)
 
-    # get total collection size
-    total_size = int(sys.argv[1])
-
-    # loop over canister
-    for canister_id in sys.argv[2:]:
-        # create a canister instance
-        canister = Canister(agent=agent, canister_id=canister_id, candid=ext_did)
-        # get registry
-        registry = get_registry(canister)
-        # extract the addresses
-        addresses = extract_addresses(registry)
-        all_addresses += addresses
-
-    # create pool of random numbers
-    random_indices = random.sample(range(total_size), len(all_addresses))
+    common_holders = get_common_holders(btcflower, ethflower)
+    print(2021 - len(common_holders))
 
     # dump addresses with random indices to file
-    dump(all_addresses, random_indices, total_size)
+    dump(common_holders)
+
+
+main()
