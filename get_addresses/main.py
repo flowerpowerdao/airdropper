@@ -1,8 +1,8 @@
-import random
 from ic.canister import Canister
 from ic.client import Client
 from ic.identity import Identity
 from ic.agent import Agent
+import os
 
 iden = Identity()
 client = Client()
@@ -31,7 +31,7 @@ def extract_addresses(registry):
 def dump(addresses, filename):
     with open(f"{filename}.txt", "w") as f:
         for address in addresses:
-            f.write(f'"{address}",')
+            f.write(f'"{address}";')
 
 
 def get_holders(canister_id: str, ext_did: str):
@@ -59,7 +59,7 @@ def get_common_holders(*lists):
 
 def main():
     # read governance candid from file
-    ext_did = open("production.did").read()
+    ext_did = open(os.path.dirname(__file__) + "/../production.did").read()
 
     print("getting holders...")
     btcflower = get_holders("pk6rk-6aaaa-aaaae-qaazq-cai", ext_did)
