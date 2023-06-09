@@ -2,6 +2,7 @@ from ic.canister import Canister
 from ic.client import Client
 from ic.identity import Identity
 from ic.agent import Agent
+from collections import Counter
 import os
 
 iden = Identity()
@@ -43,18 +44,10 @@ def get_holders(canister_id: str, ext_did: str):
     return addresses
 
 
-def get_common_holders(*lists):
-    common_holders = []
-    if len(lists) == 0:
-        return common_holders
-    btcflower_copy = lists[0].copy()
-    for holder in btcflower_copy:
-        if all(holder in lst for lst in lists):
-            common_holders.append(holder)
-            for lst in lists:
-                lst.remove(holder)
-
-    return common_holders, lists
+def get_pair_holders(holders):
+    counter = Counter(holders)
+    pair_holders = [item for item, count in counter.items() for _ in range(count // 2)]
+    return pair_holders
 
 
 def main():
@@ -62,18 +55,10 @@ def main():
     ext_did = open(os.path.dirname(__file__) + "/../production.did").read()
 
     print("getting holders...")
-    btcflower = get_holders("pk6rk-6aaaa-aaaae-qaazq-cai", ext_did)
-    ethflower = get_holders("dhiaa-ryaaa-aaaae-qabva-cai", ext_did)
-    icpflower = get_holders("4ggk4-mqaaa-aaaae-qad6q-cai", ext_did)
+    punks = get_holders("skjpp-haaaa-aaaae-qac7q-cai", ext_did)
+    result = get_pair_holders(punks)
 
-    result = get_common_holders(btcflower, ethflower, icpflower)
-    print(len(result[0]))
-    print(len(result[1][0]))
-    print(len(result[1][1]))
-    print(len(result[1][2]))
+    print(len(result))
 
     # dump addresses with random indices to file
-    dump(result[0], "triology")
-    dump(result[1][0], "btcflower")
-    dump(result[1][1], "ethflower")
-    dump(result[1][2], "icpflower")
+    dump(result, "double_punks")
